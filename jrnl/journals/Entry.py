@@ -90,9 +90,21 @@ class Entry:
 
     def _parse_tags(self) -> set[str]:
         tagsymbols = self.journal.config["tagsymbols"]
-        return {
+        if len(tagsymbols) == 0:
+            return set()
+
+        # We start by looking for everything that could be a tag (basically, any word
+        # that starts with a tag symbol)
+        tag_candidates = {
             tag.lower() for tag in re.findall(Entry.tag_regex(tagsymbols), self.text)
         }
+
+        # Then we drop all the candidates that are exclusively composed of tag symbols
+        actual_tags = {
+            tag for tag in tag_candidates if any([c not in tagsymbols for c in tag])
+        }
+
+        return actual_tags
 
     def __str__(self):
         """Returns string representation of the entry to be written to journal file."""
