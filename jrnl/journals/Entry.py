@@ -78,7 +78,14 @@ class Entry:
 
     @staticmethod
     def tag_regex(tagsymbols: str) -> re.Pattern:
-        pattern = rf"(?<!\S)([{tagsymbols}][-+*#/\w]+)"
+        # In the regex
+        #   (?<!\S)
+        #       ensures that the match starts at the first non whitespace character
+        #   ([{tagsymbols}][-+*#{tagsymbols}/\w]+)
+        #       then we look for something starting with a tag symbol, and composed of
+        #       a letters, numbers, _ (\w), tag symbols, or -+*# ending at the first
+        #       whitespace character.
+        pattern = rf"(?<!\S)([{tagsymbols}][-+*#{tagsymbols}/\w]+)"
         return re.compile(pattern)
 
     def _parse_tags(self) -> set[str]:
